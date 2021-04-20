@@ -1,22 +1,28 @@
-package com.bagas.messagingapp;
+package com.bagas.messagingapp.firebase;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import com.bagas.messagingapp.R;
+
 public class NotificationUtil {
 
-    public static Notification createNotification(Context context, String title, String body) {
+    public static Notification createNotification(Context context, String title, String body,
+                                                  PendingIntent pendingIntent) {
         NotificationCompat.Builder notification = createNotifyBuilder(context);
         notification.setContentTitle(title);
         notification.setContentText(body);
+        notification.setStyle(new NotificationCompat.BigTextStyle().bigText(body));
         notification.setSmallIcon(R.mipmap.ic_launcher);
         notification.setPriority(Notification.PRIORITY_DEFAULT);
+        notification.setContentIntent(pendingIntent);
 
         return notification.build();
     }
