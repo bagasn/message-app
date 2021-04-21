@@ -19,10 +19,12 @@ public class NotificationUtil {
         NotificationCompat.Builder notification = createNotifyBuilder(context);
         notification.setContentTitle(title);
         notification.setContentText(body);
+        notification.setAutoCancel(true);
         notification.setStyle(new NotificationCompat.BigTextStyle().bigText(body));
         notification.setSmallIcon(R.mipmap.ic_launcher);
         notification.setPriority(Notification.PRIORITY_DEFAULT);
         notification.setContentIntent(pendingIntent);
+        notification.setSound(null);
 
         return notification.build();
     }
@@ -46,6 +48,8 @@ public class NotificationUtil {
                 channelId, name, NotificationManager.IMPORTANCE_DEFAULT
         );
         channel.setDescription(description);
+        channel.setSound(null, null);
+        channel.enableVibration(true);
 
         NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
