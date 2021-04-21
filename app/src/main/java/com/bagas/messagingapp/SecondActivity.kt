@@ -10,7 +10,7 @@ class SecondActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)
 
-        val text = intent.getStringExtra("orderId")
+        val text = intent.getStringExtra("data")
         text?.let {
             findViewById<TextView>(R.id.textView).text = it
         }

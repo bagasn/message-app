@@ -9,8 +9,9 @@ import com.bagas.messagingapp.R
 import com.bagas.messagingapp.SecondActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import org.json.JSONObject
 
-class MyFirebaseMessageService : FirebaseMessagingService() {
+class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
         private const val TAG = "Firebase Service"
@@ -18,33 +19,36 @@ class MyFirebaseMessageService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (remoteMessage.data.isNotEmpty()) {
-            Log.i(TAG, "payload: ${remoteMessage.data}")
+            val data = remoteMessage.data
+
+            showNotification(data["title"], data["body"], data)
         }
 
         remoteMessage.notification?.let {
             Log.i(TAG, "notification: title = ${it.title}")
             Log.i(TAG, "notification: body = ${it.body}")
             Log.i(TAG, "notification: clickAction = ${it.clickAction}")
-
-
-            val intent = Intent(this, SecondActivity::class.java)
-            intent.putExtra("orderId", it.clickAction)
-
-            val pendingIntent = PendingIntent.getActivity(
-                this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
-            )
-
-            val notify = NotificationUtil.createNotification(
-                applicationContext,
-                it.title,
-                it.body,
-                pendingIntent
-            )
-
-            val manager = NotificationManagerCompat.from(this)
-            manager.notify(1, notify)
-            playMedia()
         }
+    }
+
+    private fun showNotification(title: String?, body: String?, data: Map<String, String>) {
+        val intent = Intent(this, SecondActivity::class.java)
+        intent.putExtra("data", mapToJsonString(data))
+
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val notify = NotificationUtil.createNotification(
+            applicationContext,
+            title,
+            body,
+            pendingIntent
+        )
+
+        val manager = NotificationManagerCompat.from(this)
+        manager.notify(1, notify)
+        playMedia()
     }
 
     override fun onNewToken(token: String) {
@@ -58,5 +62,9 @@ class MyFirebaseMessageService : FirebaseMessagingService() {
         val media = MediaPlayer.create(this, R.raw.ringtone_message)
         media.isLooping = true
         media.start()
+    }
+
+    private fun mapToJsonString(data: Map<String, String>): String {
+        return JSONObject(data).toString()
     }
 }
