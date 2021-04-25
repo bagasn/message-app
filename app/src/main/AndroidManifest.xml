@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bagas.messagingapp">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -32,8 +34,15 @@
             </intent-filter>
         </service>
 
-        <service android:name=".services.NotificationService">
-        </service>
+        <service android:name=".services.VoicePlayerService" />
+
+        <receiver android:name=".services.NotificationReceiver"
+            android:permission="">
+            <intent-filter>
+                <action android:name="com.bagas.messagingapp.START_VOICE_ORDER" />
+                <action android:name="com.bagas.messagingapp.STOP_VOICE_ORDER" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

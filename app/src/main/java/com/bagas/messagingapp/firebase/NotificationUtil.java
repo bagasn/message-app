@@ -20,11 +20,11 @@ public class NotificationUtil {
         notification.setContentTitle(title);
         notification.setContentText(body);
         notification.setAutoCancel(true);
+        notification.setSound(null);
         notification.setStyle(new NotificationCompat.BigTextStyle().bigText(body));
         notification.setSmallIcon(R.mipmap.ic_launcher);
         notification.setPriority(Notification.PRIORITY_DEFAULT);
         notification.setContentIntent(pendingIntent);
-        notification.setSound(null);
 
         return notification.build();
     }

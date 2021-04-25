@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.bagas.messagingapp.R
 import com.bagas.messagingapp.SecondActivity
+import com.bagas.messagingapp.services.NotificationReceiver
+import com.bagas.messagingapp.services.VoicePlayerService
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.json.JSONObject
@@ -21,7 +23,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (remoteMessage.data.isNotEmpty()) {
             val data = remoteMessage.data
 
-            showNotification(data["title"], data["body"], data)
+            showNotification(data["notify-title"], data["notify-body"], data)
         }
 
         remoteMessage.notification?.let {
@@ -59,9 +61,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun playMedia() {
-        val media = MediaPlayer.create(this, R.raw.ringtone_message)
-        media.isLooping = true
-        media.start()
+//        val intent = Intent(this, VoicePlayerService::class.java)
+//        startService(intent)
+
+        val broadcast = Intent()
+        broadcast.action = NotificationReceiver.ACTION_START_VOICE
+        sendBroadcast(broadcast)
     }
 
     private fun mapToJsonString(data: Map<String, String>): String {
