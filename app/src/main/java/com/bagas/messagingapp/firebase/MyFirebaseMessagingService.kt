@@ -1,14 +1,17 @@
 package com.bagas.messagingapp.firebase
 
 import android.app.PendingIntent
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
 import android.content.Intent
-import android.media.MediaPlayer
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
-import com.bagas.messagingapp.R
 import com.bagas.messagingapp.SecondActivity
-import com.bagas.messagingapp.services.NotificationReceiver
-import com.bagas.messagingapp.services.VoicePlayerService
+import com.bagas.messagingapp.services.VoiceJobService
+import com.bagas.messagingapp.services.VoiceReceiver
+import com.bagas.messagingapp.util.SPManager
+import com.bagas.messagingapp.util.SchedulerUtil
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.json.JSONObject
@@ -19,9 +22,22 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         private const val TAG = "Firebase Service"
     }
 
+    private lateinit var spManager: SPManager
+
+    override fun onCreate() {
+        super.onCreate()
+        spManager = SPManager(applicationContext)
+    }
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (remoteMessage.data.isNotEmpty()) {
             val data = remoteMessage.data
+
+            val orderStatus = data["orderStatus"]
+            if (!orderStatus.isNullOrEmpty()) {
+                spManager.orderCounter += 1
+                Log.d(TAG, "onMessageReceived: order count after add ${spManager.orderCounter}")
+            }
 
             showNotification(data["notify-title"], data["notify-body"], data)
         }
@@ -54,19 +70,19 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        val sp = getSharedPreferences("app_session", MODE_PRIVATE)
-
-        sp.edit().putString("firebase_token", token)
-            .apply()
+        spManager.firebaseToken = token
     }
 
     private fun playMedia() {
 //        val intent = Intent(this, VoicePlayerService::class.java)
 //        startService(intent)
 
-        val broadcast = Intent()
-        broadcast.action = NotificationReceiver.ACTION_START_VOICE
-        sendBroadcast(broadcast)
+//        val broadcast = Intent()
+//        broadcast.action = VoiceReceiver.ACTION_START_VOICE
+//        sendBroadcast(broadcast)
+
+        SchedulerUtil.with(applicationContext)
+            .startJob(VoiceJobService.JOB_ID, VoiceJobService::class.java)
     }
 
     private fun mapToJsonString(data: Map<String, String>): String {

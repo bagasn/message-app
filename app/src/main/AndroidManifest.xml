@@ -34,15 +34,18 @@
             </intent-filter>
         </service>
 
-        <service android:name=".services.VoicePlayerService" />
+        <service android:name=".services.VoiceJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <receiver android:name=".services.NotificationReceiver"
-            android:permission="">
-            <intent-filter>
-                <action android:name="com.bagas.messagingapp.START_VOICE_ORDER" />
-                <action android:name="com.bagas.messagingapp.STOP_VOICE_ORDER" />
-            </intent-filter>
-        </receiver>
+<!--        <service android:name=".services.VoicePlayerService" />-->
+
+<!--        <receiver android:name=".services.VoiceReceiver"-->
+<!--            android:permission="">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.bagas.messagingapp.START_VOICE_ORDER" />-->
+<!--                <action android:name="com.bagas.messagingapp.STOP_VOICE_ORDER" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
 
     </application>
 

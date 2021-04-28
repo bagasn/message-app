@@ -1,12 +1,10 @@
 package com.bagas.messagingapp
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.bagas.messagingapp.services.NotificationReceiver
-import com.bagas.messagingapp.services.VoicePlayerService
+import com.bagas.messagingapp.util.SPManager
 
 class SecondActivity : AppCompatActivity() {
 
@@ -23,7 +21,10 @@ class SecondActivity : AppCompatActivity() {
             .setOnClickListener {
 //                stopService(Intent(applicationContext, VoicePlayerService::class.java))
 
-                sendBroadcast(Intent(NotificationReceiver.ACTION_STOP_VOICE))
+//                sendBroadcast(Intent(VoiceReceiver.ACTION_STOP_VOICE))
+
+                SPManager.with(applicationContext)
+                    .orderCounter = 0
             }
     }
 
