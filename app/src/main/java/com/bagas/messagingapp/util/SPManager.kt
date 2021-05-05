@@ -10,6 +10,7 @@ class SPManager(context: Context) {
 
         private const val sp_firebase_token = "sp_firebase_token";
         private const val sp_order_counter = "sp_order_counter";
+        private const val sp_voice_played = "sp_voice_played";
 
         fun with(context: Context) = SPManager(context)
     }
@@ -29,6 +30,14 @@ class SPManager(context: Context) {
     set(value) {
         mSession.edit()
             .putInt(sp_order_counter, value)
+            .apply()
+    }
+
+    var isVoicePlay: Boolean
+    get() = mSession.getBoolean(sp_voice_played, false)
+    set(isPlay) {
+        mSession.edit()
+            .putBoolean(sp_voice_played, isPlay)
             .apply()
     }
 

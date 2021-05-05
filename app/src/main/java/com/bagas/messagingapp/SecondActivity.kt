@@ -25,6 +25,8 @@ class SecondActivity : AppCompatActivity() {
 
                 SPManager.with(applicationContext)
                     .orderCounter = 0
+                SPManager.with(applicationContext)
+                    .isVoicePlay = false
             }
     }
 

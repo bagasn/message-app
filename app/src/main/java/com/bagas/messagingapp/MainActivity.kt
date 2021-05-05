@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.TextView
@@ -20,8 +21,11 @@ import com.bagas.messagingapp.services.VoiceReceiver
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.*
 
 class MainActivity : AppCompatActivity() {
+
+    private val TAG = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,13 +37,53 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        buttonCopy.setOnClickListener {
+            copyAudioFileToStorage()
+        }
+
         init()
     }
 
     private fun init() {
-        registerVoiceReceiver()
-
         getTokenFirebase()
+    }
+
+    private fun copyAudioFileToStorage() {
+        Log.i(TAG, "copyAudioFileToStorage")
+        val assetStream = assets.open("ringtone_message.mp3")
+        val fileTarget = File(
+            getExternalFilesDir(Environment.DIRECTORY_RINGTONES),
+            "notify_voice.mp3"
+        )
+
+        try {
+            val outputStream = FileOutputStream(fileTarget)
+            startCopingFile(assetStream, outputStream)
+
+            assetStream.close()
+
+            outputStream.flush()
+            outputStream.close()
+            Log.i(TAG, "Ringtone file has been copied")
+        } catch (e: IOException) {
+            Log.e(TAG, "Error while coping file", e)
+        }
+
+    }
+
+    @Throws(IOException::class)
+    private fun startCopingFile(input: InputStream, output: OutputStream) {
+        var buffer = ByteArray(1024)
+        var read: Int
+
+        do {
+            read = input.read(buffer)
+
+            if (read != -1) {
+                output.write(buffer, 0, read)
+            }
+        } while (read != -1)
+
     }
 
     private fun registerVoiceReceiver() {
