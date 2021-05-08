@@ -1,17 +1,13 @@
 package com.bagas.messagingapp.firebase
 
 import android.app.PendingIntent
-import android.app.job.JobInfo
-import android.app.job.JobScheduler
-import android.content.ComponentName
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.bagas.messagingapp.SecondActivity
 import com.bagas.messagingapp.services.VoiceJobService
-import com.bagas.messagingapp.services.VoiceReceiver
 import com.bagas.messagingapp.util.SPManager
-import com.bagas.messagingapp.util.SchedulerUtil
+import com.bagas.messagingapp.util.ScheduleManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.json.JSONObject
@@ -23,10 +19,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private lateinit var spManager: SPManager
+    private lateinit var mScheduler: ScheduleManager
 
     override fun onCreate() {
         super.onCreate()
-        spManager = SPManager(applicationContext)
+
+        spManager = SPManager.with(applicationContext)
+        mScheduler = ScheduleManager.with(applicationContext)
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -81,8 +80,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 //        broadcast.action = VoiceReceiver.ACTION_START_VOICE
 //        sendBroadcast(broadcast)
 
-        SchedulerUtil.with(applicationContext)
-            .startJob(VoiceJobService.JOB_ID, VoiceJobService::class.java)
+        if (!mScheduler.isJobServiceRunning(VoiceJobService.JOB_ID)) {
+            mScheduler.startJob(VoiceJobService.JOB_ID, VoiceJobService::class.java)
+        }
     }
 
     private fun mapToJsonString(data: Map<String, String>): String {

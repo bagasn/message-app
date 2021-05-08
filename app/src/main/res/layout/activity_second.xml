@@ -14,9 +14,24 @@
         android:textSize="24sp" />
 
     <Button
+        android:id="@+id/btn_start_job"
+        android:layout_width="wrap_content"
+        android:onClick="buttonClicked"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Start Job" />
+
+    <Button
+        android:id="@+id/btn_stop_job"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Stop Job" />
+
+    <Button
         android:id="@+id/btn_stop_service"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="Stop Service" />
 

@@ -1,8 +1,5 @@
 package com.bagas.messagingapp
 
-import android.Manifest
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
@@ -10,14 +7,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.bagas.messagingapp.livedata.UserLiveData
+import com.bagas.messagingapp.services.VoiceJobService
 import com.bagas.messagingapp.services.VoiceReceiver
+import com.bagas.messagingapp.util.SPManager
+import com.bagas.messagingapp.util.ScheduleManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.android.synthetic.main.activity_main.*
@@ -27,10 +21,14 @@ class MainActivity : AppCompatActivity() {
 
     private val TAG = "MainActivity"
 
+    private lateinit var spManager: SPManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContentView(R.layout.activity_main)
+
+        spManager = SPManager.with(applicationContext)
 
         buttonFuckYou.setOnClickListener {
             val intent = Intent(this, SecondActivity::class.java)
@@ -46,6 +44,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun init() {
         getTokenFirebase()
+
+        checkJobSchedulerRunningService()
+    }
+
+    private fun checkJobSchedulerRunningService() {
+        val scheduler = ScheduleManager.with(applicationContext)
+
+        if (spManager.orderCounter > 0) {
+            if (!scheduler.isJobServiceRunning(VoiceJobService.JOB_ID)) {
+                scheduler.startJob(VoiceJobService.JOB_ID, VoiceJobService::class.java)
+            }
+        }
     }
 
     private fun copyAudioFileToStorage() {
