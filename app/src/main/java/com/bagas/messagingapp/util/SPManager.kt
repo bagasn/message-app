@@ -33,12 +33,4 @@ class SPManager(context: Context) {
             .apply()
     }
 
-    var isVoicePlay: Boolean
-    get() = mSession.getBoolean(sp_voice_played, false)
-    set(isPlay) {
-        mSession.edit()
-            .putBoolean(sp_voice_played, isPlay)
-            .apply()
-    }
-
 }

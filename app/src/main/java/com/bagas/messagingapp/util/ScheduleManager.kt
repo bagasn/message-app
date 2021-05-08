@@ -30,9 +30,12 @@ class ScheduleManager private constructor(private val context: Context) {
         Log.d(TAG, "invoke cancel scheduler")
     }
 
-    fun getJob(jobId: Int) : JobInfo? {
+    fun getJob(jobId: Int): JobInfo? {
         for (jobInfo in mJobScheduler.allPendingJobs) {
-            if (jobInfo.id == jobId) return jobInfo
+            if (jobInfo.id == jobId) {
+                Log.i(TAG, "Get job with id $jobId")
+                return jobInfo
+            }
         }
         return null
     }
@@ -55,7 +58,6 @@ class ScheduleManager private constructor(private val context: Context) {
 
     private fun getJobInfo(jobId: Int, component: ComponentName): JobInfo {
         return JobInfo.Builder(jobId, component)
-            .setPeriodic(500)
             .build()
     }
 

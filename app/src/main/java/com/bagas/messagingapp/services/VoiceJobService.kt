@@ -21,6 +21,7 @@ class VoiceJobService : JobService(), MediaPlayer.OnPreparedListener {
     private lateinit var session: SPManager
     private lateinit var mScheduler: ScheduleManager
     private var mMediaPlayer: MediaPlayer? = null
+    private var mThread: MyThread? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -31,17 +32,36 @@ class VoiceJobService : JobService(), MediaPlayer.OnPreparedListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "onDestroy")
+        Log.e(TAG, "onDestroy")
+
+        mThread?.let {
+
+        }
+
+        mMediaPlayer?.let {
+            if (it.isPlaying) {
+                it.stop()
+            }
+
+            it.reset()
+            it.release()
+        }
     }
 
     override fun onStartJob(params: JobParameters?): Boolean {
         Log.d(TAG, "Voice job is started")
-        playVoice(params)
+
+        if (session.orderCounter > 0) {
+            playVoice(params)
+        } else {
+            jobFinished(params, false)
+            Log.w(TAG, "Invoke jobFinished immediately")
+        }
         return true
     }
 
     override fun onStopJob(params: JobParameters?): Boolean {
-        Log.e(TAG, "Voice job has stopped")
+        Log.w(TAG, "Voice job has stopped")
         return true
     }
 
@@ -54,10 +74,21 @@ class VoiceJobService : JobService(), MediaPlayer.OnPreparedListener {
 
     private fun playVoice(params: JobParameters?) {
         initMedia()
-        MyThread(params).start()
+
+        if ((mThread == null) or (mThread?.isAlive != true)) {
+            mThread = MyThread(params).apply {
+                start()
+            }
+        }
     }
 
     private fun initMedia() {
+        mMediaPlayer?.let {
+            if (it.isPlaying) {
+                return
+            }
+        }
+
         val fileAudio =
             File(getExternalFilesDir(Environment.DIRECTORY_RINGTONES), "notify_voice.mp3")
         val audioUri = Uri.parse(fileAudio.absolutePath)
@@ -94,36 +125,34 @@ class VoiceJobService : JobService(), MediaPlayer.OnPreparedListener {
 
             while (session.orderCounter > 0) {
                 try {
-                    sleep(500)
+                    sleep(1000)
 
-                    Log.d(TAG, "Is media playing? ${mMediaPlayer?.isPlaying}")
                     if (session.orderCounter > 0) {
-                        mMediaPlayer?.let {
-                            if (!it.isPlaying) {
+                        if (mMediaPlayer == null) {
+                            playVoice(mJobParameters)
+                            break
+                        } else {
+                            if (mMediaPlayer?.isPlaying == false) {
                                 playVoice(mJobParameters)
+                                break
                             }
-                        }
-                    } else {
-                        mMediaPlayer?.apply {
-                            if (isPlaying) {
-                                stop()
-                            }
-
-                            reset()
-                            release()
-                            jobFinished(mJobParameters, false)
-                            Log.w(TAG, "Invoke jobFinished from thread")
                         }
                     }
                 } catch (e: InterruptedException) {
                     Log.e(TAG, "InterruptedException while Time Loop", e)
-                } catch (e: Exception) {
+                } catch (e: IllegalStateException) {
                     Log.e(TAG, "Exception while Time Loop", e)
-
-                    playVoice(mJobParameters)
-                    Log.i(TAG, "Re-play audio from thread")
+                } finally {
+                    Log.d(TAG, "Thread is looping")
+                    Log.d(TAG, "MediaPlayer is null? $mMediaPlayer")
                 }
             }
+
+            if (session.orderCounter <= 0) {
+                jobFinished(mJobParameters, false)
+                Log.w(TAG, "Invoke jobfinished from Thread")
+            }
+            Log.w(TAG, "Thread has finished")
         }
     }
 }

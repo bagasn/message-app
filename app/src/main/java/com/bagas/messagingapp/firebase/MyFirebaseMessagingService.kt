@@ -21,6 +21,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private lateinit var spManager: SPManager
     private lateinit var mScheduler: ScheduleManager
 
+    private var notifIdCounter = 1;
+
     override fun onCreate() {
         super.onCreate()
 
@@ -64,7 +66,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         )
 
         val manager = NotificationManagerCompat.from(this)
-        manager.notify(1, notify)
+        manager.notify(notifIdCounter++, notify)
         playMedia()
     }
 

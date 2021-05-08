@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bagas.messagingapp.services.DemoJobService
+import com.bagas.messagingapp.services.VoiceJobService
 import com.bagas.messagingapp.util.SPManager
 import com.bagas.messagingapp.util.ScheduleManager
 import kotlinx.android.synthetic.main.activity_second.*
@@ -36,21 +37,22 @@ class SecondActivity : AppCompatActivity() {
 
         SPManager.with(applicationContext)
             .orderCounter = 0
-        SPManager.with(applicationContext)
-            .isVoicePlay = false
     }
 
     fun buttonClicked(view: View?) {
         when (view?.id) {
             R.id.btn_start_job -> {
-                if (!mScheduler.isJobServiceRunning(DemoJobService.JOB_ID)) {
-                    mScheduler.startJob(DemoJobService.JOB_ID, DemoJobService::class.java)
+//                if (!mScheduler.isJobServiceRunning(DemoJobService.JOB_ID)) {
+                    mScheduler.startJob(VoiceJobService.JOB_ID, VoiceJobService::class.java)
                     Log.d(TAG, "starting job service")
-                }
+//                }
             }
             R.id.btn_stop_job -> {
                 Log.d(TAG, "invoke stopJob")
-                mScheduler.stopJob(DemoJobService.JOB_ID)
+                mScheduler.stopJob(VoiceJobService.JOB_ID)
+            }
+            R.id.btn_check_job -> {
+                mScheduler.isJobServiceRunning(VoiceJobService.JOB_ID)
             }
             R.id.btn_stop_service -> {
                 stopService()

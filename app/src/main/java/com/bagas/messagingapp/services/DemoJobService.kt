@@ -9,6 +9,11 @@ class DemoJobService : JobService() {
 
     private var jobCounter = 0
 
+    override fun onCreate() {
+        super.onCreate()
+        Log.d(TAG, "Job is created")
+    }
+
     override fun onStartJob(params: JobParameters?): Boolean {
         Log.d(TAG, "onStartJob")
 

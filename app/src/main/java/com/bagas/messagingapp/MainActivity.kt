@@ -1,5 +1,6 @@
 package com.bagas.messagingapp
 
+import android.app.job.JobScheduler
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
@@ -8,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import com.bagas.messagingapp.services.DemoJobService
 import com.bagas.messagingapp.services.VoiceJobService
 import com.bagas.messagingapp.services.VoiceReceiver
 import com.bagas.messagingapp.util.SPManager
@@ -52,8 +54,10 @@ class MainActivity : AppCompatActivity() {
         val scheduler = ScheduleManager.with(applicationContext)
 
         if (spManager.orderCounter > 0) {
-            if (!scheduler.isJobServiceRunning(VoiceJobService.JOB_ID)) {
+            if (!scheduler.isJobServiceRunning(DemoJobService.JOB_ID)) {
                 scheduler.startJob(VoiceJobService.JOB_ID, VoiceJobService::class.java)
+            } else {
+                scheduler.getJob(VoiceJobService.JOB_ID)
             }
         }
     }
